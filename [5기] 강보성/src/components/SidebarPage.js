@@ -1,57 +1,32 @@
-import NewBtn from './NewBtn'
-export default function SidebarPage({ $target, initalState }) {
-    this.state = initalState
+import NewBtn from './NewBtn.js'
+import SideBarList from './SidebarList.js'
+import { request } from '../../utils/api.js'
 
-    this.createTreeView = (data) => {
-        let str = ''
-        for (const key in data) {
-            if (data[key].documents.length > 0) {
-                str += `
-                    <li class="dataList">
-                        📄 ${data[key].title}
-                        <button class="addBtn">➕</button>
-                        <button class="delBtn">🗑️</button>
-                        <ul>${this.createTreeView(data[key].documents)}</ul>
-                    </li>
-               `
-            } else {
-                str += `
-                <li class="dataList">
-                    📄 ${data[key].title}
-                    <button class="addBtn">➕</button>
-                    <button class="delBtn">🗑️</button>
-                </li>
-           `
-            }
-        }
-        return str
-    }
+export default function SidebarPage({ $target, initalState, onEditing }) {
     const $page = document.createElement('div')
-    $page.classList.add('listContainer')
-    $page.innerHTML = `
-        <ul>
-            ${this.state
-                .map(
-                    (document) =>
-                        `<li class="dataList">📄 ${document.title}
-                        <button class="addBtn">➕</button>
-                        <button class="delBtn">🗑️</button>
-                    </li>
-                    ${
-                        document.documents.length > 0
-                            ? `<ul>${this.createTreeView(
-                                  document.documents
-                              )} </ul>`
-                            : ''
-                    }
-                    
-                    
-                    `
-                )
-                .join('')}
-        </ul>
-    `
     $target.appendChild($page)
 
-    const $newBtn = new NewBtn({ $target: $page })
+    $page.classList.add('listContainer')
+    const $sidebarList = new SideBarList({
+        $target: $page,
+        initalState,
+        onEditing,
+    })
+
+    this.setState = () => {
+        $sidebarList.setState()
+    }
+
+    const onCreate = () => {
+        request('', {
+            method: 'POST',
+            body: JSON.stringify({
+                title: '문서 제목2',
+                parent: null,
+            }),
+        })
+        $sidebarList.setState()
+    }
+
+    const $newBtn = new NewBtn({ $target: $page, onCreate, onEditing })
 }
